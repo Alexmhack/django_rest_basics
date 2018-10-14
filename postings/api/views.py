@@ -31,3 +31,11 @@ class BlogListAPIView(generics.ListAPIView):
 
 	def get_queryset(self):
 		return Blog.objects.all().order_by('-timestamp')
+
+	# add create as well as list functionality to view
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
+
+	# adds the post method in allowed methods list
+	def post(self, request, *args, **kwargs):
+		pass
