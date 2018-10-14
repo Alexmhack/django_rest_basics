@@ -34,6 +34,8 @@ class BlogListAPIView(mixins.CreateModelMixin, generics.ListAPIView):
 
 	def get_queryset(self):
 		qs = Blog.objects.all().order_by('-timestamp')
+
+		# search method in api
 		query = self.request.GET.get('q', None)
 		if query is not None:
 			qs = qs.filter(
