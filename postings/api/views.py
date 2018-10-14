@@ -1,6 +1,8 @@
 from rest_framework import generics, mixins
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
+from django.db.models import Q
+
 from postings.models import Blog
 from .serializers import BlogSerializer
 
@@ -31,7 +33,13 @@ class BlogListAPIView(mixins.CreateModelMixin, generics.ListAPIView):
 	serializer_class = BlogSerializer
 
 	def get_queryset(self):
-		return Blog.objects.all().order_by('-timestamp')
+		qs = Blog.objects.all().order_by('-timestamp')
+		query = self.request.GET.get('q', None)
+		if query is not None:
+			qs = qs.filter(
+				Q(title__icontains=query) | Q(content__icontains=query)
+			).distinct()
+		return qs
 
 	# add create as well as list functionality to view
 	def perform_create(self, serializer):
