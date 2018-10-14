@@ -14,3 +14,10 @@ class BlogRUDView(generics.RetrieveUpdateDestroyAPIView):
 
 	# def get_queryset(self):
 	# 	return Blog.objects.all()
+
+
+class BlogCreateAPIView(generics.CreateApiView):
+	serializer_class = BlogSerializer
+
+	def get_queryset(self):
+		return Blog.objects.all()
