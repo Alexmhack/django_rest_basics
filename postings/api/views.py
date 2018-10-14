@@ -16,8 +16,11 @@ class BlogRUDView(generics.RetrieveUpdateDestroyAPIView):
 	# 	return Blog.objects.all()
 
 
-class BlogCreateAPIView(generics.CreateApiView):
+class BlogCreateAPIView(generics.CreateAPIView):
 	serializer_class = BlogSerializer
 
 	def get_queryset(self):
 		return Blog.objects.all()
+
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
