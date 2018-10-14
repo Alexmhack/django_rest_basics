@@ -90,3 +90,123 @@ REST_FRAMEWORK = {
     ),
 }
 ```
+
+## Implementation
+For **postings** folder we create a sub python module named **api** which will contain 
+all the files for **postings** app *API*
+
+Just like django **Model-View-Controller** ```rest_framework``` also works on the same
+principle.
+
+We have three files:
+
+1. ```api/serializers.py```
+2. ```api/views.py```
+3. ```api/urls.py```
+
+**Serializers** convert the data into json objects and also validates over that data.
+Rest Framework **Generic Views** work just like generic views from Django -> **Create 
+Retrieve Update Delete** Views.
+
+But before working with views we need to create a serializer, which can be done using the 
+model serializer which means the serializer is based on the app model
+
+```
+from rest_framework import serializers
+
+from postings.models import Blog
+
+class BlogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Blog
+        fields = ('pk', 'user', 'title', 'content', 'timestamp')
+        read_only_fields = ('user',)
+```
+
+And along with that we can create a validate method for the model serializer which has 
+syntax ```validate_<field_name>``` or alltogether ```validate``` which validates over all 
+fields
+
+```
+class BlogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Blog
+        fields = ('pk', 'user', 'title', 'content', 'timestamp')
+        read_only_fields = ('user',)
+
+        # serializer converts to json and validates the data
+        
+    # validate_<field_name>
+    def validate_title(self, value):
+        qs = Blog.objects.filter(title__iexact=value)
+
+        # excludes the instance
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("This title has already been used")
+        return value
+```
+
+Now we can use this model serializer in our views.
+
+```generics.RetrieveUpdateDestroyAPIView``` gives the three main methods for the model instances namely **GET PUT DELETE** which does not include ```Create``` view or the **POST** method.
+
+```
+class BlogRUDView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Blog.objects.all().order_by('-timestamp')
+    serializer_class = BlogSerializer
+    permission_classes = (IsAuthenticated,)
+
+    # def get_queryset(self):
+    #   return Blog.objects.all()
+```
+
+You can either define the ```get_queryset``` method or use ```queryset``` option, refer
+[docs](https://www.django-rest-framework.org/api-guide/generic-views/#methods) for more info.
+
+With our views and models defined we just need the url endpoints for the API. Here comes the use of ```api/urls.py``` file. Which are simple url paths made from ```django.urls.path```
+
+```
+from django.urls import path
+
+from .views import BlogRUDView
+
+app_name = 'api-postings'
+
+urlpatterns = [
+    path('<int:pk>', BlogRUDView.as_view(), name='blog-rud'),
+]
+```
+
+But before continuing we need to include these api urls in project urls
+
+**cfehome/urls.py**
+```
+...
+# api endpoints
+urlpatterns += [
+    path('api/blog/', include('postings.api.urls', namespace='api-postings')),
+]
+```
+
+Now run the server and on the [admin](http://127.0.0.1:8000/admin) site create some blog 
+posts that and then go to [127.0.0.1:8000/api/blog/1](http://127.0.0.1:8000/api/blog/1)
+
+You will find all the fields that we defined in the ```ModelSerializer``` in json data 
+format. If you cannot access the url and get an error saying
+
+```
+HTTP 401 Unauthorized
+Allow: GET, POST, HEAD, OPTIONS
+Content-Type: application/json
+Vary: Accept
+WWW-Authenticate: JWT realm="api"
+
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+This comes from the ```permission_classes = (IsAuthenticated,)``` in ```BlogRUDView```
+which makes this view accessible to only the authenticated users, there is also ```IsAdminUser``` which gives permission to users with ```is staff``` flag **True**.
