@@ -24,3 +24,10 @@ class BlogCreateAPIView(generics.CreateAPIView):
 
 	def perform_create(self, serializer):
 		serializer.save(user=self.request.user)
+
+
+class BlogListAPIView(generics.ListAPIView):
+	serializer_class = BlogSerializer
+
+	def get_queryset(self):
+		return Blog.objects.all().order_by('-timestamp')
