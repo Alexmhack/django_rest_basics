@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from postings.models import Blog
@@ -16,17 +16,18 @@ class BlogRUDView(generics.RetrieveUpdateDestroyAPIView):
 	# 	return Blog.objects.all()
 
 
-class BlogCreateAPIView(generics.CreateAPIView):
-	serializer_class = BlogSerializer
+# class BlogCreateAPIView(generics.CreateAPIView):
+# 	serializer_class = BlogSerializer
 
-	def get_queryset(self):
-		return Blog.objects.all()
+# 	def get_queryset(self):
+# 		return Blog.objects.all()
 
-	def perform_create(self, serializer):
-		serializer.save(user=self.request.user)
+# 	def perform_create(self, serializer):
+# 		serializer.save(user=self.request.user)
 
 
-class BlogListAPIView(generics.ListAPIView):
+# view that supports both GET and POST method
+class BlogListAPIView(mixins.CreateModelMixin, generics.ListAPIView):
 	serializer_class = BlogSerializer
 
 	def get_queryset(self):
@@ -38,4 +39,4 @@ class BlogListAPIView(generics.ListAPIView):
 
 	# adds the post method in allowed methods list
 	def post(self, request, *args, **kwargs):
-		pass
+		return self.create(request, *args, **kwargs)
