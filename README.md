@@ -210,3 +210,35 @@ WWW-Authenticate: JWT realm="api"
 
 This comes from the ```permission_classes = (IsAuthenticated,)``` in ```BlogRUDView```
 which makes this view accessible to only the authenticated users, there is also ```IsAdminUser``` which gives permission to users with ```is staff``` flag **True**.
+
+## REST [Mixin](https://www.django-rest-framework.org/api-guide/generic-views/#mixins)
+Django REST Framework has a seperate view for Create Operation called the [CreateAPIView](https://www.django-rest-framework.org/api-guide/generic-views/#createapiview) that works very similarly to [CreateView](https://docs.djangoproject.com/en/2.1/ref/class-based-views/generic-editing/#createview) in django.
+
+But we will be implementing a post method using [mixins](https://www.django-rest-framework.org/api-guide/generic-views/#createmodelmixin) which gives ```.create``` method which is then used in post request,
+
+```
+class BlogListAPIView(mixins.CreateModelMixin, generics.ListAPIView):
+    serializer_class = BlogSerializer
+
+    def get_queryset(self):
+        return Blog.objects.all().order_by('-timestamp')
+
+    # add create as well as list functionality to view
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    # adds the post method in allowed methods list
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+```
+
+And the url for this view will be like
+
+```
+urlpatterns = [
+    path('', BlogListAPIView.as_view(), name='blog-list'),
+    ...
+```
+
+Now on visting [127.0.0.1:8000/api/blog/](http://127.0.0.1:8000/api/blog/) you get **POST** method as well as **GET** method, the get method gives the list of blogs and on 
+filling the form in the bottom of page you can create a blog.
