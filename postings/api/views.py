@@ -12,7 +12,7 @@ class BlogRUDView(generics.RetrieveUpdateDestroyAPIView):
 	# lookup_field = "pk"	"pk" is the default lookup field in generic view
 	queryset = Blog.objects.all().order_by('-timestamp')
 	serializer_class = BlogSerializer
-	permission_classes = (IsAuthenticated,)
+	# permission_classes = (IsAuthenticated,)	specify default in settings
 
 	# def get_queryset(self):
 	# 	return Blog.objects.all()
