@@ -1,6 +1,8 @@
 from django.db import models
-
+from django.urls import reverse
 from django.conf import settings
+
+from rest_framework.reverse import reverse as api_reverse
 
 class Blog(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -14,3 +16,11 @@ class Blog(models.Model):
 	@property
 	def owner(self):
 		return self.user
+
+	# get_absolute_url method for api
+	def get_api_url(self):
+		return api_reverse('api-postings:blog-rud', kwargs={'pk': self.pk})
+
+	# use django reverse for its urls
+	# def get_absolute_url(self):
+	# 	return reverse('')
