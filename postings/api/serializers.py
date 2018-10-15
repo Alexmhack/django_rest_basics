@@ -7,8 +7,8 @@ class BlogSerializer(serializers.ModelSerializer):
 	
 	class Meta:
 		model = Blog
-		fields = ('url', 'pk', 'user', 'title', 'content', 'timestamp')
-		read_only_fields = ('user',)
+		fields = ('url', 'id', 'user', 'title', 'content', 'timestamp')
+		read_only_fields = ('user', 'id')
 
 		# serializer converts to json and validates the data
 	
