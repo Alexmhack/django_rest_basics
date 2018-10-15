@@ -18,8 +18,12 @@ class Blog(models.Model):
 		return self.user
 
 	# get_absolute_url method for api
-	def get_api_url(self):
-		return api_reverse('api-postings:blog-rud', kwargs={'pk': self.pk})
+	def get_api_url(self, request=None):
+		return api_reverse(
+			'api-postings:blog-rud',
+			kwargs={'pk': self.pk},
+			request=request
+		)
 
 	# use django reverse for its urls
 	# def get_absolute_url(self):

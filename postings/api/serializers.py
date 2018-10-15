@@ -14,7 +14,8 @@ class BlogSerializer(serializers.ModelSerializer):
 	
 	# get_<field_name> method
 	def get_url(self, obj):
-		return obj.get_api_url()
+		request = self.context.get('request')
+		return obj.get_api_url(request=request)
 		
 	# validate_<field_name>
 	def validate_title(self, value):

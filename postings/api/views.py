@@ -16,8 +16,12 @@ class BlogRUDView(generics.RetrieveUpdateDestroyAPIView):
 	# permission_classes = (IsAuthenticated,)	specify default in settings
 	permission_classes = (IsOwnerOrReadOnly,)
 
+	# either use method or queryset
 	# def get_queryset(self):
 	# 	return Blog.objects.all()
+
+	def get_serializer_context(self, *args, **kwargs):
+		return {"request": self.request}
 
 
 # class BlogCreateAPIView(generics.CreateAPIView):
@@ -52,3 +56,6 @@ class BlogListAPIView(mixins.CreateModelMixin, generics.ListAPIView):
 	# adds the post method in allowed methods list
 	def post(self, request, *args, **kwargs):
 		return self.create(request, *args, **kwargs)
+
+	def get_serializer_context(self, *args, **kwargs):
+		return {"request": self.request}
