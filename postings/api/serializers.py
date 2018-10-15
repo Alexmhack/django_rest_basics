@@ -5,10 +5,14 @@ from postings.models import Blog
 class BlogSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Blog
-		fields = ('pk', 'user', 'title', 'content', 'timestamp')
+		url = serializers.SerializerModelField(read_only=True)
+		fields = ('url', 'pk', 'user', 'title', 'content', 'timestamp')
 		read_only_fields = ('user',)
 
 		# serializer converts to json and validates the data
+	
+	def get_url(self, obj):
+		return obj.get_api_url()
 		
 	# validate_<field_name>
 	def validate_title(self, value):
