@@ -3,14 +3,16 @@ from rest_framework import serializers
 from postings.models import Blog
 
 class BlogSerializer(serializers.ModelSerializer):
+	url = serializers.SerializerMethodField(read_only=True)
+	
 	class Meta:
 		model = Blog
-		url = serializers.SerializerModelField(read_only=True)
 		fields = ('url', 'pk', 'user', 'title', 'content', 'timestamp')
 		read_only_fields = ('user',)
 
 		# serializer converts to json and validates the data
 	
+	# get_<field_name> method
 	def get_url(self, obj):
 		return obj.get_api_url()
 		
