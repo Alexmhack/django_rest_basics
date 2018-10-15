@@ -5,6 +5,7 @@ from django.db.models import Q
 
 from postings.models import Blog
 from .serializers import BlogSerializer
+from .permissions import IsOwnerOrReadOnly
 
 class BlogRUDView(generics.RetrieveUpdateDestroyAPIView):
 	# RetrieveUpdateDestroyAPIView / RetrieveAPIView
@@ -13,6 +14,7 @@ class BlogRUDView(generics.RetrieveUpdateDestroyAPIView):
 	queryset = Blog.objects.all().order_by('-timestamp')
 	serializer_class = BlogSerializer
 	# permission_classes = (IsAuthenticated,)	specify default in settings
+	permission_classes = (IsOwnerOrReadOnly,)
 
 	# def get_queryset(self):
 	# 	return Blog.objects.all()
