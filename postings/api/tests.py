@@ -20,3 +20,7 @@ class BlogAPITestCase(APITestCase):
 	def test_single_user(self):
 		user_count = User.objects.count()
 		self.assertEqual(user_count, 1)
+
+	def test_single_blog(self):
+		blog_count = Blog.objects.count()
+		self.assertEqual(blog_count, 1)
